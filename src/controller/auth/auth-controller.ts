@@ -33,6 +33,18 @@ export const login = async (req: Request, res: Response) => {
       sameSite: "none", // Set to 'none' if using cross-site requests
     })
 
+    const decodedToken = jwt.decode(token) as jwt.JwtPayload
+    if (!decodedToken || !decodedToken.id) {
+      return res.status(400).json({ message: "Invalid token." })
+    }
+    await prisma.blacklistedToken.create({
+      data: {
+        token,
+        expires_at: new Date(decodedToken.exp! * 1000),
+        userId: decodedToken.id,
+      },
+    })
+
     return res.status(200).json({
       message: "Login successful",
       token,
@@ -90,22 +102,17 @@ export const logout = async (req: Request, res: Response) => {
     }
     const token = authHeader.split(" ")[1]
 
-    try {
-      const decodedToken = jwt.decode(token) as jwt.JwtPayload
-      if (!decodedToken || !decodedToken.id) {
-        return res.status(400).json({ message: "Invalid token." })
-      }
-      await prisma.blacklistedToken.create({
-        data: {
-          token,
-          expires_at: new Date(decodedToken.exp! * 1000),
-          userId: decodedToken.id,
-        },
-      })
-      return res.status(200).json({ message: "Logout Successful." })
-    } catch (error) {
-      return res.status(500).json({ message: "Something went wrong." })
+    const decodedToken = jwt.decode(token) as jwt.JwtPayload
+    if (!decodedToken || !decodedToken.id) {
+      return res.status(400).json({ message: "Invalid token." })
     }
+    await prisma.blacklistedToken.delete({
+      where: {
+        token,
+        userId: decodedToken.id,
+      },
+    })
+    return res.status(200).json({ message: "Logout Successful." })
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong." })
   }

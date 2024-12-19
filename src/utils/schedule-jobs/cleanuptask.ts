@@ -7,10 +7,13 @@ const scheduleCleanupTasks = () => {
     async () => {
       try {
         const now = new Date()
+        const localNow = new Date(
+          now.getTime() - now.getTimezoneOffset() * 60000
+        )
         const deletedTokens = await prisma.blacklistedToken.deleteMany({
           where: {
             expires_at: {
-              lt: now,
+              lt: localNow,
             },
           },
         })

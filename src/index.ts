@@ -32,6 +32,7 @@ app.use("/", homeRoute)
 app.use("/auth", authRoute)
 app.use("/private", authMiddleware as any, postRoute)
 
+// new update v.3
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
   scheduleCleanupTasks()

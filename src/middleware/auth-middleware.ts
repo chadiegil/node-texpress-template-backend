@@ -20,7 +20,7 @@ export const authMiddleware = async (
         token,
       },
     })
-    if (blacklistedToken) {
+    if (blacklistedToken == null) {
       return res.status(403).json({ message: "Token has been invalidated." })
     }
     jwt.verify(
