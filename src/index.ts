@@ -27,9 +27,7 @@ declare global {
     }
   }
 }
-
 // routes
-
 app.use("/", homeRoute)
 app.use("/auth", authRoute)
 app.use("/private", authMiddleware as any, postRoute)
