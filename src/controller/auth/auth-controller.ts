@@ -12,14 +12,14 @@ export const login = async (req: Request, res: Response) => {
       },
     })
 
-    if (!user) {
+    if (user == null) {
       return res.status(404).json({ message: "User not found" })
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password)
 
     if (!isValidPassword) {
-      return res.status(401).json({ message: "Invalid credentials." })
+      res.status(401).json({ message: "Invalid credentials." })
     }
 
     const token = jwt.sign(
@@ -35,7 +35,7 @@ export const login = async (req: Request, res: Response) => {
 
     const decodedToken = jwt.decode(token) as jwt.JwtPayload
     if (!decodedToken || !decodedToken.id) {
-      return res.status(400).json({ message: "Invalid token." })
+      res.status(400).json({ message: "Invalid token." })
     }
     await prisma.blacklistedToken.create({
       data: {
@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
       },
     })
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "Login successful",
       token,
       user: { ...user, password: undefined },
@@ -66,8 +66,7 @@ export const register = async (req: Request, res: Response) => {
       },
     })
 
-    if (existingUser)
-      return res.status(400).json({ message: "User already exist." })
+    if (existingUser) res.status(400).json({ message: "User already exist." })
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -84,7 +83,7 @@ export const register = async (req: Request, res: Response) => {
         updated_at: new Date(),
       },
     })
-    return res.status(201).json({
+    res.status(201).json({
       message: "User created successfully.",
       user: { ...newUser, password: undefined },
     })
@@ -98,13 +97,17 @@ export const logout = async (req: Request, res: Response) => {
     const authHeader = req.headers.authorization
 
     if (authHeader == null) {
-      return res.status(401).json({ message: "Unauthorized." })
+      res.status(401).json({ message: "Unauthorized." })
     }
-    const token = authHeader.split(" ")[1]
+    const token = authHeader?.split(" ")[1]
+
+    if (!token) {
+      return res.status(400).json({ message: "Token not found" })
+    }
 
     const decodedToken = jwt.decode(token) as jwt.JwtPayload
     if (!decodedToken || !decodedToken.id) {
-      return res.status(400).json({ message: "Invalid token." })
+      res.status(400).json({ message: "Invalid token." })
     }
     await prisma.blacklistedToken.delete({
       where: {
@@ -112,8 +115,8 @@ export const logout = async (req: Request, res: Response) => {
         userId: decodedToken.id,
       },
     })
-    return res.status(200).json({ message: "Logout Successful." })
+    res.status(200).json({ message: "Logout Successful." })
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong." })
+    res.status(500).json({ message: "Something went wrong." })
   }
 }
