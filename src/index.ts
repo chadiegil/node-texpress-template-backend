@@ -11,6 +11,8 @@ import { authMiddleware } from "./middleware/auth-middleware"
 import postRoute from "./routes/post/post-route"
 import scheduleCleanupTasks from "./utils/schedule-jobs/cleanuptask"
 
+import path from "path"
+
 dotenv.config()
 
 const app = express()
@@ -27,11 +29,14 @@ declare global {
     }
   }
 }
+
 // routes
 app.use("/", homeRoute)
 app.use("/auth", authRoute)
 app.use("/post", postRoute)
 app.use("/private", authMiddleware as any, postRoute)
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
 
 // new update v.3
 app.listen(PORT, () => {
