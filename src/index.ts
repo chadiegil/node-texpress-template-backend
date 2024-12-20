@@ -36,7 +36,14 @@ app.use("/auth", authRoute)
 app.use("/post", postRoute)
 app.use("/private", authMiddleware as any, postRoute)
 
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
+// no authmiddleware
+// app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
+
+app.use(
+  "/uploads",
+  authMiddleware as any,
+  express.static(path.join(__dirname, "../uploads"))
+)
 
 // new update v.3
 app.listen(PORT, () => {
