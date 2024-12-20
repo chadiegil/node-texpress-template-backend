@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "cleanup-token":"ts-node ./src/utils/schedule-jobs/cleanuptask.ts"
+    "cleanup-token": "ts-node ./src/utils/schedule-jobs/cleanuptask.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
     "node-schedule": "^2.1.1",
     "nodemon": "^3.1.9"
   },
@@ -30,6 +31,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.12",
     "prisma": "^6.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
