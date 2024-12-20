@@ -30,6 +30,7 @@ declare global {
 // routes
 app.use("/", homeRoute)
 app.use("/auth", authRoute)
+app.use("/post", postRoute)
 app.use("/private", authMiddleware as any, postRoute)
 
 // new update v.3
