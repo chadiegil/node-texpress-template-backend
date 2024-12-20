@@ -38,5 +38,9 @@ export const deleteById = async (userId: number, postId: number) => {
 }
 
 export const getById = async (id: number) => {
-  return await PostRepository.getById(id)
+  const post = await PostRepository.getById(id)
+  if (!post) {
+    throw new CustomError("Post not found.", 404)
+  }
+  return post
 }

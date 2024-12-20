@@ -17,6 +17,19 @@ export const index = async (req: Request, res: Response) => {
   }
 }
 
+export const getSinglePost = async (req: Request, res: Response) => {
+  try {
+    const postId = req.params.id
+    const post = await PostService.getById(parseInt(postId))
+    res.json(post)
+  } catch (error) {
+    if (error instanceof CustomError) {
+      res.status(error.status).json({ message: error.message })
+    }
+    res.status(500).json({ message: "Something went wrong." })
+  }
+}
+
 export const createPost = async (req: Request, res: Response) => {
   try {
     const { description } = req.body
