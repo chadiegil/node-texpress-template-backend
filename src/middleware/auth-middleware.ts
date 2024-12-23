@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken"
 import { NextFunction, type Request, type Response } from "express"
 import { User } from "../types/user-type"
-import prisma from "../utils/prisma"
 
 export const authMiddleware = async (
   req: Request,
@@ -15,18 +14,11 @@ export const authMiddleware = async (
   const token = authHeader.split(" ")[1]
 
   try {
-    const blacklistedToken = await prisma.blacklistedToken.findUnique({
-      where: {
-        token,
-      },
-    })
-    if (blacklistedToken == null) {
-      return res.status(403).json({ message: "Token has been invalidated." })
-    }
     jwt.verify(
       token,
       process.env.SECRET_TOKEN as string,
       async (error: unknown, decoded: unknown) => {
+        console.log("error", error)
         if (error != null) {
           return res.status(403).json({ message: "Forbidden" })
         }
