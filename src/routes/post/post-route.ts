@@ -8,7 +8,11 @@ const router = express.Router()
 router.get("/", PostController.index)
 router.get("/post/:id", PostController.getSinglePost)
 router.get("/post", PostController.getPost)
-router.post("/create", upload.single("attachment"), PostController.createPost)
+router.post(
+  "/create",
+  upload.single("attachment"),
+  PostController.createPost as any
+)
 router.put(
   "/update/:id",
   upload.single("attachment"),
