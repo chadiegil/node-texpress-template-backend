@@ -3,13 +3,12 @@ import bodyParser from "body-parser"
 import cookieParser from "cookie-parser"
 import dotenv from "dotenv"
 import { User } from "./types/user-type"
-
+import cors from "cors"
 // routes import
 import homeRoute from "./routes/home-route"
 import authRoute from "./routes/auth/auth-route"
 import { authMiddleware } from "./middleware/auth-middleware"
 import postRoute from "./routes/post/post-route"
-import scheduleCleanupTasks from "./utils/schedule-jobs/cleanuptask"
 
 import path from "path"
 
@@ -18,6 +17,13 @@ dotenv.config()
 const app = express()
 
 const PORT = process.env.PORT ?? 5000
+
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.WHITELIST?.split(","),
+  })
+)
 
 app.use(cookieParser())
 app.use(bodyParser.json())
@@ -48,5 +54,4 @@ app.use(
 // new update v.3
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
-  scheduleCleanupTasks()
 })
