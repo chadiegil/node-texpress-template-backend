@@ -5,10 +5,22 @@ import jwt from "jsonwebtoken"
 import ms from "ms"
 import { User } from "../../types/user-type"
 import { generateToken } from "../../utils/generate-token"
+import {
+  authRegisterSchema,
+  authLoginSchema,
+} from "../../utils/validation/auth-schema"
+import { ValidationError } from "yup"
+import CustomError from "../../utils/custom-error"
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body
   try {
+    const { email, password } = req.body
+
+    await authLoginSchema.validate({
+      email,
+      password,
+    })
+
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -53,15 +65,37 @@ export const login = async (req: Request, res: Response) => {
       user: { ...user, password: undefined },
     })
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return res.status(400).json({ error: error.message })
+    }
+    if (error instanceof CustomError) {
+      return res.status(400).json({ message: error.message })
+    }
     res.status(500).json({ message: "Something went wrong." })
   }
 }
 
 export const register = async (req: Request, res: Response) => {
-  const { email, password, first_name, last_name, role, address, contact_no } =
-    req.body
-
   try {
+    const {
+      email,
+      password,
+      first_name,
+      last_name,
+      role,
+      address,
+      contact_no,
+    } = req.body
+    await authRegisterSchema.validate({
+      email,
+      password,
+      first_name,
+      last_name,
+      role,
+      address,
+      contact_no,
+    })
+
     const existingUser = await prisma.user.findUnique({
       where: {
         email,
@@ -90,6 +124,12 @@ export const register = async (req: Request, res: Response) => {
       user: { ...newUser, password: undefined },
     })
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return res.status(400).json({ error: error.message })
+    }
+    if (error instanceof CustomError) {
+      return res.status(error.status).json({ message: error.message })
+    }
     res.status(500).json({ message: "Something went wrong." })
   }
 }
