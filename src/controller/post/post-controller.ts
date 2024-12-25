@@ -3,6 +3,8 @@ import path from "path"
 import { type Request, type Response } from "express"
 import * as PostService from "../../service/post/post-service"
 import CustomError from "../../utils/custom-error"
+import { postSchema } from "../../utils/validation/post-schema"
+import { ValidationError } from "yup"
 
 export const getPost = async (req: Request, res: Response) => {
   res.status(200).json({ message: "Post!" })
@@ -33,10 +35,12 @@ export const getSinglePost = async (req: Request, res: Response) => {
 export const createPost = async (req: Request, res: Response) => {
   try {
     const { description } = req.body
+
+    await postSchema.validate({
+      description,
+    })
+
     const userId = req.user.id
-    if (!description) {
-      res.status(400).json({ message: "Description is required." })
-    }
 
     let attachment = ""
     if (req.file) {
@@ -46,6 +50,12 @@ export const createPost = async (req: Request, res: Response) => {
     const newPost = await PostService.create(userId, description, attachment)
     res.json(newPost)
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return res.status(400).json({ error: error.message })
+    }
+    if (error instanceof CustomError) {
+      return res.status(error.status).json({ message: error.message })
+    }
     res.status(500).json({ message: "Something went wrong." })
   }
 }
