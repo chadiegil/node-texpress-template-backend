@@ -86,15 +86,18 @@ export const register = async (req: Request, res: Response) => {
       address,
       contact_no,
     } = req.body
-    await authRegisterSchema.validate({
-      email,
-      password,
-      first_name,
-      last_name,
-      role,
-      address,
-      contact_no,
-    })
+    await authRegisterSchema.validate(
+      {
+        email,
+        password,
+        first_name,
+        last_name,
+        role,
+        address,
+        contact_no,
+      },
+      { abortEarly: false }
+    )
 
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -125,11 +128,18 @@ export const register = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(400).json({ error: error.message })
+      return res.status(400).json({
+        message: "Validation error",
+        errors: error.inner.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
+      })
     }
     if (error instanceof CustomError) {
       return res.status(error.status).json({ message: error.message })
     }
+    console.log("error", error)
     res.status(500).json({ message: "Something went wrong." })
   }
 }

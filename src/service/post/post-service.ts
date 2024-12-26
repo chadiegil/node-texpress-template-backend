@@ -3,6 +3,38 @@ import { type Request, type Response } from "express"
 import * as PostRepository from "../../repository/post/post-repository"
 import CustomError from "../../utils/custom-error"
 
+export const getAllByFilters = async (description: string, page: string) => {
+  const itemsPerPage = 10
+  const parsePage = parseInt(page)
+  const currentPage = isNaN(parsePage) || parsePage < 0 ? 1 : parsePage
+
+  const where = {
+    description: {
+      contains: description,
+    },
+  }
+
+  const postPaginated = await PostRepository.paginateByFilters(
+    (currentPage - 1) * itemsPerPage,
+    itemsPerPage,
+    where
+  )
+
+  const totalItems = await PostRepository.countAllByFilters(where)
+  const totalPages = Math.ceil(totalItems / itemsPerPage)
+
+  return {
+    data: postPaginated,
+    pageInfo: {
+      hasPreviosPage: currentPage > 1,
+      hasNextPage: currentPage < totalPages,
+      currentPage,
+      totalPages,
+      totalItems,
+    },
+  }
+}
+
 export const getPost = async () => {
   return await PostRepository.getPost()
 }

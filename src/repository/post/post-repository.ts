@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client"
 import prisma from "../../utils/prisma"
 
 export const getPost = async () => {
@@ -16,6 +17,26 @@ export const create = async (
       attachment,
       created_at: new Date(),
       updated_at: new Date(),
+    },
+  })
+}
+
+export const countAllByFilters = async (where: Prisma.PostWhereInput) => {
+  const count = await prisma.post.count({ where })
+  return count
+}
+
+export const paginateByFilters = async (
+  skip: number,
+  take: number,
+  where: Prisma.PostWhereInput
+) => {
+  return await prisma.post.findMany({
+    skip,
+    take,
+    where,
+    orderBy: {
+      id: "desc",
     },
   })
 }

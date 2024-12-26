@@ -6,17 +6,29 @@ import CustomError from "../../utils/custom-error"
 import { postSchema } from "../../utils/validation/post-schema"
 import { ValidationError } from "yup"
 
-export const getPost = async (req: Request, res: Response) => {
-  res.status(200).json({ message: "Post!" })
-}
-
 export const index = async (req: Request, res: Response) => {
   try {
-    const posts = await PostService.getPost()
+    const { description, page } = req.query
+    const posts = await PostService.getAllByFilters(
+      description as string,
+      page as string
+    )
     res.json(posts)
   } catch (error) {
     res.status(500).json({ message: "Something went wrong." })
   }
+}
+// export const index = async (req: Request, res: Response) => {
+//   try {
+//     const posts = await PostService.getPost()
+//     res.json(posts)
+//   } catch (error) {
+//     res.status(500).json({ message: "Something went wrong." })
+//   }
+// }
+
+export const getPost = async (req: Request, res: Response) => {
+  res.status(200).json({ message: "Post!" })
 }
 
 export const getSinglePost = async (req: Request, res: Response) => {
@@ -36,9 +48,12 @@ export const createPost = async (req: Request, res: Response) => {
   try {
     const { description } = req.body
 
-    await postSchema.validate({
-      description,
-    })
+    await postSchema.validate(
+      {
+        description,
+      },
+      { abortEarly: false }
+    )
 
     const userId = req.user.id
 
@@ -51,7 +66,13 @@ export const createPost = async (req: Request, res: Response) => {
     res.json(newPost)
   } catch (error) {
     if (error instanceof ValidationError) {
-      return res.status(400).json({ error: error.message })
+      return res.status(400).json({
+        message: "Validation error",
+        errors: error.inner.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
+      })
     }
     if (error instanceof CustomError) {
       return res.status(error.status).json({ message: error.message })
