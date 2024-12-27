@@ -1,5 +1,3 @@
-import { type Request, type Response } from "express"
-
 import * as PostRepository from "../../repository/post/post-repository"
 import CustomError from "../../utils/custom-error"
 
