@@ -122,7 +122,7 @@ export const register = async (req: Request, res: Response) => {
         updated_at: new Date(),
       },
     })
-    res.status(201).json({
+    return res.status(201).json({
       message: "User created successfully.",
       user: { ...newUser, password: undefined },
     })
@@ -139,8 +139,7 @@ export const register = async (req: Request, res: Response) => {
     if (error instanceof CustomError) {
       return res.status(error.status).json({ message: error.message })
     }
-    console.log("error", error)
-    res.status(500).json({ message: "Something went wrong." })
+    return res.status(500).json({ message: "Something went wrong." })
   }
 }
 

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { NextFunction, type Request, type Response } from "express"
 import { User } from "../types/user-type"
 
-export const authMiddleware = async (
+export const adminMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,6 +22,13 @@ export const authMiddleware = async (
           return res.status(403).json({ message: "Forbidden" })
         }
         const decodedToken = decoded as User
+
+        if (decodedToken.role === undefined) {
+          return res.status(403).json({ message: "PermissionError" })
+        }
+        if (!decodedToken.role.includes("admin")) {
+          return res.status(403).json({ message: "PermissionError" })
+        }
         req.user = decodedToken
         next()
       }
