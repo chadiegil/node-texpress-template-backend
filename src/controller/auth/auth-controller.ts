@@ -27,14 +27,14 @@ export const login = async (req: Request, res: Response) => {
       },
     })
 
-    if (user == null) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" })
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password)
 
     if (!isValidPassword) {
-      res.status(401).json({ message: "Invalid credentials." })
+      return res.status(401).json({ message: "Invalid credentials." })
     }
 
     const access_token = generateToken(
@@ -48,18 +48,18 @@ export const login = async (req: Request, res: Response) => {
     )
 
     res.cookie("authToken", refresh_token, {
-      httpOnly: true, // accessible by web server only
+      httpOnly: true,
       maxAge: ms("1h"),
       secure: true,
-      sameSite: "none", // Set to 'none' if using cross-site requests
+      sameSite: "none",
     })
 
     const decodedToken = jwt.decode(access_token) as jwt.JwtPayload
     if (!decodedToken || !decodedToken.id) {
-      res.status(400).json({ message: "Invalid token." })
+      return res.status(400).json({ message: "Invalid token." })
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Login successful",
       access_token,
       user: { ...user, password: undefined },
@@ -71,7 +71,7 @@ export const login = async (req: Request, res: Response) => {
     if (error instanceof CustomError) {
       return res.status(400).json({ message: error.message })
     }
-    res.status(500).json({ message: "Something went wrong." })
+    return res.status(500).json({ message: "Something went wrong." })
   }
 }
 
@@ -122,7 +122,7 @@ export const register = async (req: Request, res: Response) => {
         updated_at: new Date(),
       },
     })
-    res.status(201).json({
+    return res.status(201).json({
       message: "User created successfully.",
       user: { ...newUser, password: undefined },
     })
@@ -139,8 +139,7 @@ export const register = async (req: Request, res: Response) => {
     if (error instanceof CustomError) {
       return res.status(error.status).json({ message: error.message })
     }
-    console.log("error", error)
-    res.status(500).json({ message: "Something went wrong." })
+    return res.status(500).json({ message: "Something went wrong." })
   }
 }
 
