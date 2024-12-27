@@ -12,7 +12,8 @@ router.get("/post/:id", PostController.getSinglePost)
 router.get("/post", PostController.getPost)
 router.post(
   "/create",
-  adminMiddleware as any,
+  // adminMiddleware as any,
+  authMiddleware as any,
   upload.single("attachment"),
   PostController.createPost as any
 )
