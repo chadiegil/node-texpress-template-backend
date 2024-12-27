@@ -2,7 +2,7 @@ import { object, string } from "yup"
 
 export const authLoginSchema = object().shape({
   email: string().required("Email is required"),
-  password: string().required("Password is requird"),
+  password: string().required("Password is required"),
 })
 
 export const authRegisterSchema = object().shape({
