@@ -47,7 +47,7 @@ app.use("/private", authMiddleware as any, postRoute)
 
 app.use(
   "/uploads",
-  authMiddleware as any,
+  // authMiddleware as any,
   express.static(path.join(__dirname, "../uploads"))
 )
 
