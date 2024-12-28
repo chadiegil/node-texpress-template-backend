@@ -8,8 +8,8 @@ import { authMiddleware } from "../../middleware/auth-middleware"
 const router = express.Router()
 
 router.get("/", PostController.index)
-router.get("/post/:id", PostController.getSinglePost)
-router.get("/post", PostController.getPost)
+router.get("/:id", PostController.getSinglePost)
+// router.get("/post", PostController.getPost)
 router.post(
   "/create",
   // adminMiddleware as any,

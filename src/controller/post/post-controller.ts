@@ -27,9 +27,9 @@ export const index = async (req: Request, res: Response) => {
 //   }
 // }
 
-export const getPost = async (req: Request, res: Response) => {
-  res.status(200).json({ message: "Post!" })
-}
+// export const getPost = async (req: Request, res: Response) => {
+//   res.status(200).json({ message: "Post!" })
+// }
 
 export const getSinglePost = async (req: Request, res: Response) => {
   try {
