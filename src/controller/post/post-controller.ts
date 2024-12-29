@@ -18,6 +18,7 @@ export const index = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Something went wrong." })
   }
 }
+
 // export const index = async (req: Request, res: Response) => {
 //   try {
 //     const posts = await PostService.getPost()
